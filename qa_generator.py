@@ -1,7 +1,6 @@
 import uuid
-import json
-from typing import Any, Dict, List, Tuple
 import numpy as np
+from typing import Any, Dict, List, Tuple
 from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import PydanticOutputParser
@@ -12,12 +11,7 @@ from langchain_core.prompts import (
 )
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
-from .resolver import (
-    resolve_entity,
-    build_name_index,
-    extract_tags,
-    slice_relevant_xml,
-)
+from resolver import resolve_entity, extract_tags, slice_relevant_xml
 
 class EntityList(BaseModel):
     entities: List[str] = Field(..., description="exact names as they appear in Capella")
@@ -28,25 +22,28 @@ class QA(BaseModel):
     sources:  List[str]
 
 class QASet(BaseModel):
-    simple_fact:       QA
+    simple_fact:        QA
     simple_conditional: QA
-    comparison:        QA
-    interpretative:    QA
-    multi_answer:      QA
-    aggregation:       QA
-    multi_hop:         QA
-    heavy_post:        QA
-    erroneous:         QA
-    summary:           QA
+    comparison:         QA
+    interpretative:     QA
+    multi_answer:       QA
+    aggregation:        QA
+    multi_hop:          QA
+    heavy_post:         QA
+    erroneous:          QA
+    summary:            QA
 
-def setup_entity_extractor() -> Tuple[ChatOpenAI, ChatPromptTemplate, PydanticOutputParser]:
+def setup_entity_extractor(
+    api_key: str,
+    api_base: str
+) -> Tuple[ChatOpenAI, ChatPromptTemplate, PydanticOutputParser]:
     """
     Initialize LLM, prompt templates, and parser for entity extraction.
     """
     llm = ChatOpenAI(
         model_name      = "google/gemini-2.0-flash-001",
-        openai_api_key  = None,  # pulled from .env by CLI
-        openai_api_base = None,
+        openai_api_key  = api_key,
+        openai_api_base = api_base,
     )
     parser = PydanticOutputParser(pydantic_object=EntityList)
     raw_inst = parser.get_format_instructions()
@@ -55,18 +52,21 @@ def setup_entity_extractor() -> Tuple[ChatOpenAI, ChatPromptTemplate, PydanticOu
         "You are an assistant that extracts Capella element names from user queries "
         "and returns them **only** as JSON matching this schema:\n\n" + safe_inst
     )
-    user_tmpl   = HumanMessagePromptTemplate.from_template("{user_query}")
-    prompt      = ChatPromptTemplate.from_messages([system_tmpl, user_tmpl])
+    user_tmpl = HumanMessagePromptTemplate.from_template("{user_query}")
+    prompt    = ChatPromptTemplate.from_messages([system_tmpl, user_tmpl])
     return llm, prompt, parser
 
-def setup_qa_llm() -> Tuple[ChatOpenAI, PydanticOutputParser]:
+def setup_qa_llm(
+    api_key: str,
+    api_base: str
+) -> Tuple[ChatOpenAI, PydanticOutputParser]:
     """
     Initialize LLM and parser for generating the QA set.
     """
     llm = ChatOpenAI(
         model_name      = "google/gemini-2.5-pro-preview",
-        openai_api_key  = None,
-        openai_api_base = None,
+        openai_api_key  = api_key,
+        openai_api_base = api_base,
     )
     parser = PydanticOutputParser(pydantic_object=QASet)
     return llm, parser
