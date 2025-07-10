@@ -2,3 +2,5 @@
 /results
 /__pycache__
 /data
+/gradio_tmp
+markdown_out_ui.py

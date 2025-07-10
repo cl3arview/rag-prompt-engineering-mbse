@@ -109,10 +109,12 @@ def run(args):
     print("Building Chroma vector index…")
     vectordb = build_vector_index(chunks, persist_dir=str(outdir_path / "chroma"))
 
-    # 8) Initialize LLMs with env credentials
+    # 8) Initialize LLMs with env credentials /  TODO: better document te params
     extract_llm, extract_prompt, extract_parser = setup_entity_extractor(
         api_key=api_key, api_base=api_base
     )
+
+    # Agent responsible for generating the question/answer/source truple
     qa_llm, qa_parser = setup_qa_llm(
         api_key=api_key, api_base=api_base
     )
