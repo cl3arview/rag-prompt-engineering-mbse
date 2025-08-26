@@ -67,21 +67,31 @@ The pipeline orchestrates the following high-level steps:
 
 ## Installation
 
-1. **Clone the repository**  
-   ```bash
-   git clone https://github.com/cl3arview/rag-prompt-engineering-mbse
-   cd rag-prompt-engineering-mbse
-   ```
+These are the steps to set up a Python 3 virtual environment named `vmbse`, install dependencies, and run the project UI on **Windows**, **macOS (zsh/bash)** and **Linux**:
 
-2. **Create the Conda environment from the YAML file**  
-   ```bash
-   conda env create -n mbseqa -f requirements.yaml
-   ```
+```bash
+# Step 1: Create the virtual environment named "vmbse" (Windows)
+py -3 -m venv vmbse
+# macOS/Linux alternative:
+# python3 -m venv vmbse
 
-3. **Activate the environment**  
-   ```bash
-   conda activate mbseqa
-   ```
+# Step 2: Activate the virtual environment (Windows PowerShell)
+.\vmbse\Scripts\Activate.ps1
+# Windows Command Prompt alternative:
+# vmbse\Scripts\activate.bat
+# macOS/Linux alternative:
+# source vmbse/bin/activate
+
+# Step 3: Upgrade pip and install dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# Step 4: Verify installed packages
+pip list
+
+# Step 5: Run the project UI
+python ui.py
+```
 
 ---
 
@@ -165,11 +175,6 @@ If `--graph_json_out` is set, a snapshot of the Capella graph is also saved for 
 Set one of the following pairs in your shell or via a `.env` file:
 
 ```dotenv
-OPENAI_API_KEY=your_openai_api_key
-OPENAI_API_BASE=https://api.openai.com/v1
-
-# — or —
-
 OPENROUTER_API_KEY=your_openrouter_api_key
 OPENROUTER_BASE_URL=https://your.openrouter.endpoint
 ```
